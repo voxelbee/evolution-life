@@ -15,15 +15,14 @@ public class EntityAI extends EntityPlayerMP
     super( server, worldIn, profile, interactionManagerIn );
   }
 
-  public void setMovement( float forward, float strafe, boolean sprint )
+  public void setAiMovement( float forward, float strafe, boolean sprint )
   {
     this.setSprinting( sprint );
     this.moveForward = MathHelper.clamp( forward, -0.3f, 0.5f );
     this.moveStrafing = MathHelper.clamp( strafe, -0.3f, 0.3f );
   }
 
-  @Override
-  public void setRotation( float yaw, float pitch )
+  public void setAiRotation( float yaw, float pitch )
   {
     this.rotationPitch = pitch % 360;
     this.rotationYaw = yaw % 360;

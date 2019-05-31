@@ -24,7 +24,7 @@ public class EventListener
     }
     else
     {
-      EvolutionLife.manager.update( event.world.getServer() );
+      EvolutionLife.manager.update();
     }
   }
 }

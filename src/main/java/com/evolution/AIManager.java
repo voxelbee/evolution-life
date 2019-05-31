@@ -16,26 +16,38 @@ import net.minecraft.world.dimension.DimensionType;
 public class AIManager
 {
   private List< EntityAI > ais = new ArrayList< EntityAI >();
-  private int numberToSpawn = 100;
+  private MinecraftServer mcServer;
+  public int spawnCount = 0;
 
-  public void createNewAI( MinecraftServer server )
+  public AIManager( MinecraftServer server )
   {
-    EntityAI player = new EntityAI( server,
-        server.getWorld( DimensionType.OVERWORLD ),
-        new GameProfile( UUID.randomUUID(), "Jim" + numberToSpawn ),
-        new PlayerInteractionManager( server.getWorld( DimensionType.OVERWORLD ) ) );
-    server.getPlayerList().initializeConnectionToPlayer( new NetworkManager( EnumPacketDirection.CLIENTBOUND ), player );
+    this.mcServer = server;
+  }
+
+  public void createNewAI( String name )
+  {
+    EntityAI player = new EntityAI( mcServer,
+        mcServer.getWorld( DimensionType.OVERWORLD ),
+        new GameProfile( UUID.randomUUID(), name ),
+        new PlayerInteractionManager( mcServer.getWorld( DimensionType.OVERWORLD ) ) );
+    mcServer.getPlayerList().initializeConnectionToPlayer( new NetworkManager( EnumPacketDirection.CLIENTBOUND ), player );
     player.stepHeight = 0.5f;
     player.setGameType( GameType.SURVIVAL );
     ais.add( player );
   }
 
-  public void update( MinecraftServer server )
+  public void update()
   {
-    for ( EntityAI ai : ais )
+    if ( spawnCount > 0 )
     {
-      ai.setMovement( 1.0f, 0.0f, false );
-      ai.setRotation( (float) Math.random() * 360, (float) Math.random() * 360 );
+      this.createNewAI( "Jim" );
+
+      spawnCount-- ;
+    }
+    for ( EntityAI ai : this.ais )
+    {
+      ai.setAiMovement( 1.0f, 0.0f, false );
+      ai.setAiRotation( (float) Math.random() * 360, (float) Math.random() * 360 );
       ai.playerTick();
     }
   }

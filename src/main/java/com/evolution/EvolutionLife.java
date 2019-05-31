@@ -78,9 +78,12 @@ public class EvolutionLife
 
   // You can use SubscribeEvent and let the Event Bus discover methods to call
   @SubscribeEvent
-  public void onServerStarting( FMLServerStartingEvent event )
+  public void onServerStarting( FMLServerStartingEvent event ) throws Exception
   {
-    manager = new AIManager();
+    manager = new AIManager( event.getServer() );
+    AIServer server = new AIServer( "localhost", 5000 );
+    Thread serverThread = new Thread( server );
+    serverThread.start();
   }
 
   // You can use EventBusSubscriber to automatically subscribe events on the contained class (this is subscribing to the
