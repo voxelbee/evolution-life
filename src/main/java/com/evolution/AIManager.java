@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.evolution.network.ServerManager;
 import com.mojang.authlib.GameProfile;
 
 import net.minecraft.network.EnumPacketDirection;
@@ -18,6 +19,7 @@ public class AIManager
   private List< EntityAI > ais = new ArrayList< EntityAI >();
   private MinecraftServer mcServer;
   public int spawnCount = 0;
+  public ServerManager server;
 
   public AIManager( MinecraftServer server )
   {
