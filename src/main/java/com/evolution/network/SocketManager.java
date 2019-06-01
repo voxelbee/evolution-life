@@ -7,6 +7,9 @@ import java.net.Socket;
 
 import com.evolution.EvolutionLife;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+
 public class SocketManager
 {
   private Socket socket;
@@ -46,17 +49,8 @@ public class SocketManager
           catch ( IOException e )
           {
             e.printStackTrace();
+            isListening = false;
           }
-        }
-
-        // Close the socket
-        try
-        {
-          socket.close();
-        }
-        catch ( IOException e )
-        {
-          e.printStackTrace();
         }
       }
     } ) ).start();
@@ -75,8 +69,9 @@ public class SocketManager
 
     byte[] buffer = new byte[ dataSize ];
     this.in.read( buffer );
+    ByteBuf buf = Unpooled.wrappedBuffer( buffer );
 
-    EvolutionLife.manager.server.handleInPacket( buffer, this.id );
+    EvolutionLife.manager.server.handleInPacket( buf, this.id );
   }
 
   /**
@@ -103,5 +98,15 @@ public class SocketManager
   public void close()
   {
     this.isListening = false;
+
+    // Close the socket
+    try
+    {
+      socket.close();
+    }
+    catch ( IOException e )
+    {
+      e.printStackTrace();
+    }
   }
 }

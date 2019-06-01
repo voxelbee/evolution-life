@@ -10,7 +10,6 @@ import java.util.List;
 import com.evolution.EvolutionLife;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 
 public class ServerManager
 {
@@ -46,12 +45,6 @@ public class ServerManager
             e.printStackTrace();
           }
         }
-
-        // Closes all of the client sockets
-        for ( SocketManager socketManager : clients )
-        {
-          socketManager.close();
-        }
       }
     } ) ).start();
   }
@@ -83,14 +76,24 @@ public class ServerManager
    * @param buf - In buffer to handle
    * @param client - Client id that the data is from
    */
-  public void handleInPacket( byte[] buf, int client )
+  public void handleInPacket( ByteBuf buf, int client )
   {
-    ByteBuf buffer = Unpooled.wrappedBuffer( buf );
-    int packetType = buffer.readInt();
+    int packetType = buf.readInt();
     if ( packetType == 0 )
     {
-      int numberOfClients = buffer.readInt();
+      int numberOfClients = buf.readInt();
       EvolutionLife.manager.spawnCount += numberOfClients;
+    }
+    buf.release();
+  }
+
+  public void close()
+  {
+    this.isRunning = false;
+    // Closes all of the client sockets
+    for ( SocketManager socketManager : clients )
+    {
+      socketManager.close();
     }
   }
 }
