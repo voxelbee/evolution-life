@@ -7,9 +7,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.evolution.EvolutionLife;
-
-import io.netty.buffer.ByteBuf;
+import com.evolution.network.packet.AIPacket;
 
 public class ServerManager
 {
@@ -65,26 +63,9 @@ public class ServerManager
    * @param buf - The data to send
    * @param id - The id of the client to send the data to
    */
-  public void sendToClient( byte[] buf, int id )
+  public void sendToClient( AIPacket packet, int id )
   {
-    this.clients.get( id ).sendBytes( buf );
-  }
-
-  /**
-   * Handles the receiving of a packet from the inputed client
-   *
-   * @param buf - In buffer to handle
-   * @param client - Client id that the data is from
-   */
-  public void handleInPacket( ByteBuf buf, int client )
-  {
-    int packetType = buf.readInt();
-    if ( packetType == 0 )
-    {
-      int numberOfClients = buf.readInt();
-      EvolutionLife.manager.spawnCount += numberOfClients;
-    }
-    buf.release();
+    this.clients.get( id ).sendPacket( packet );
   }
 
   public void close()

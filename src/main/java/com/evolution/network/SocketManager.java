@@ -5,7 +5,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
-import com.evolution.EvolutionLife;
+import com.evolution.network.packet.AIPacket;
+import com.evolution.network.packet.EnumPacketTypes;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -69,9 +70,13 @@ public class SocketManager
 
     byte[] buffer = new byte[ dataSize ];
     this.in.read( buffer );
+
     ByteBuf buf = Unpooled.wrappedBuffer( buffer );
 
-    EvolutionLife.manager.server.handleInPacket( buf, this.id );
+    AIPacket packet = EnumPacketTypes.PacketTypes.getPacketFromID( buf.readInt() );
+    packet.readPacket( buf );
+    packet.handlePacket();
+    buf.release();
   }
 
   /**
@@ -79,17 +84,32 @@ public class SocketManager
    *
    * @param buffer
    */
-  public void sendBytes( byte[] buffer )
+  private void sendBytes( ByteBuf buffer )
   {
     try
     {
-      this.out.write( buffer );
+      this.out.write( buffer.readableBytes() );
+      buffer.getBytes( 0, this.out, buffer.readableBytes() );
       this.out.flush();
     }
     catch ( IOException e )
     {
       e.printStackTrace();
     }
+  }
+
+  /**
+   * Sends the packet to the server
+   *
+   * @param packet
+   */
+  public void sendPacket( AIPacket packet )
+  {
+    ByteBuf buf = Unpooled.directBuffer( 8 );
+    buf.writeInt( EnumPacketTypes.PacketTypes.getIdFromPacket( packet ) ); // Writes the id to the buffer
+    packet.writePacket( buf );
+    this.sendBytes( buf );
+    buf.release();
   }
 
   /**
