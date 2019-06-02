@@ -9,7 +9,7 @@ import com.evolution.network.packet.AIPacket;
 public class MainThreadPacketHandler
 {
   private static Queue< ClientPacketHolder > packetQueue = new PriorityQueue< ClientPacketHolder >();
-  private static int maxPacketProcessing = 10;
+  private static int maxPacketProcessing = 2000;
 
   public static void handlePacket( AIPacket packet, UUID clientId )
   {

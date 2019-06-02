@@ -8,7 +8,7 @@ import java.util.Map;
 public enum EnumPacketTypes
 {
   CLIENTCOUNT( ClientCountPacket.class ),
-  MOVEMENT( MovementPacket.class );
+  DNA( DNAPacket.class );
 
   private Class< ? > packetClass;
 

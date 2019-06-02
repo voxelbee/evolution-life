@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.evolution.ai.EvolutionManager;
 
+import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -28,6 +29,7 @@ public class EvolutionLife
   public static final int PORT = 5000;
 
   public static EvolutionManager manager;
+  public static MinecraftServer mcServer;
 
   public EvolutionLife()
   {

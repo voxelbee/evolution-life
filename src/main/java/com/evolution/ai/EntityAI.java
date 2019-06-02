@@ -1,5 +1,7 @@
 package com.evolution.ai;
 
+import java.util.UUID;
+
 import com.mojang.authlib.GameProfile;
 
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -10,9 +12,9 @@ import net.minecraft.world.WorldServer;
 
 public class EntityAI extends EntityPlayerMP
 {
-  private byte[] DNA;
+  public UUID owner;
 
-  protected EntityAI( MinecraftServer server, WorldServer worldIn, GameProfile profile, PlayerInteractionManager interactionManagerIn )
+  public EntityAI( MinecraftServer server, WorldServer worldIn, GameProfile profile, PlayerInteractionManager interactionManagerIn )
   {
     super( server, worldIn, profile, interactionManagerIn );
   }
@@ -27,15 +29,5 @@ public class EntityAI extends EntityPlayerMP
   {
     this.rotationPitch = pitch % 360;
     this.rotationYaw = yaw % 360;
-  }
-
-  public byte[] getDNA()
-  {
-    return this.DNA;
-  }
-
-  public void setDNA( byte[] inDNA )
-  {
-    this.DNA = inDNA;
   }
 }

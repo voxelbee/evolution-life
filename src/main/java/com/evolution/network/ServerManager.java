@@ -14,7 +14,7 @@ import com.evolution.network.packet.AIPacket;
 public class ServerManager
 {
   private boolean isRunning;
-  private Map< UUID, SocketManager > clients = new HashMap< UUID, SocketManager >();
+  private Map< UUID, Client > clients = new HashMap< UUID, Client >();
   private ServerSocket server;
 
   /**
@@ -58,7 +58,7 @@ public class ServerManager
   {
     Socket socket = server.accept();
     UUID id = UUID.randomUUID();
-    this.clients.put( id, new SocketManager( socket, id ) );
+    this.clients.put( id, new Client( new SocketManager( socket, id ), id ) );
   }
 
   /**
@@ -69,16 +69,51 @@ public class ServerManager
    */
   public void sendToClient( AIPacket packet, UUID id )
   {
-    this.clients.get( id ).sendPacket( packet );
+    this.clients.get( id ).getSocket().sendPacket( packet );
   }
 
+  /**
+   * Closes all of the sockets and the server.
+   */
   public void close()
   {
     this.isRunning = false;
+
     // Closes all of the client sockets
     for ( UUID key : clients.keySet() )
     {
-      clients.remove( key ).close();
+      clients.remove( key ).getSocket().close();
     }
+
+    try
+    {
+      this.server.close();
+    }
+    catch ( IOException e )
+    {
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * Updates all of the clients and there owned entities.
+   */
+  public void tickClients()
+  {
+    for ( UUID key : clients.keySet() )
+    {
+      clients.get( key ).tick();
+    }
+  }
+
+  /**
+   * Returns the client with the specified UUID.
+   *
+   * @param id
+   * @return
+   */
+  public Client getClient( UUID id )
+  {
+    return this.clients.get( id );
   }
 }
