@@ -1,4 +1,4 @@
-package com.evolution;
+package com.evolution.ai;
 
 import com.mojang.authlib.GameProfile;
 
@@ -10,14 +10,15 @@ import net.minecraft.world.WorldServer;
 
 public class EntityAI extends EntityPlayerMP
 {
+  private byte[] DNA;
+
   protected EntityAI( MinecraftServer server, WorldServer worldIn, GameProfile profile, PlayerInteractionManager interactionManagerIn )
   {
     super( server, worldIn, profile, interactionManagerIn );
   }
 
-  public void setAiMovement( float forward, float strafe, boolean sprint )
+  public void setAiMovement( float forward, float strafe )
   {
-    this.setSprinting( sprint );
     this.moveForward = MathHelper.clamp( forward, -0.3f, 0.5f );
     this.moveStrafing = MathHelper.clamp( strafe, -0.3f, 0.3f );
   }
@@ -26,5 +27,15 @@ public class EntityAI extends EntityPlayerMP
   {
     this.rotationPitch = pitch % 360;
     this.rotationYaw = yaw % 360;
+  }
+
+  public byte[] getDNA()
+  {
+    return this.DNA;
+  }
+
+  public void setDNA( byte[] inDNA )
+  {
+    this.DNA = inDNA;
   }
 }

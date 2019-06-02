@@ -1,5 +1,7 @@
 package com.evolution.network.packet;
 
+import java.util.UUID;
+
 import io.netty.buffer.ByteBuf;
 
 public interface AIPacket
@@ -8,5 +10,5 @@ public interface AIPacket
 
   public void writePacket( ByteBuf buf );
 
-  public void handlePacket();
+  public void handlePacket( UUID clientID );
 }

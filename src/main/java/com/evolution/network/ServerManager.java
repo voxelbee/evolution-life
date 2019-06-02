@@ -3,16 +3,18 @@ package com.evolution.network;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import com.evolution.network.packet.AIPacket;
 
 public class ServerManager
 {
   private boolean isRunning;
-  private List< SocketManager > clients = new ArrayList< SocketManager >();
+  private Map< UUID, SocketManager > clients = new HashMap< UUID, SocketManager >();
   private ServerSocket server;
 
   /**
@@ -54,7 +56,9 @@ public class ServerManager
    */
   private void listen() throws IOException
   {
-    this.clients.add( new SocketManager( server.accept(), this.clients.size() ) );
+    Socket socket = server.accept();
+    UUID id = UUID.randomUUID();
+    this.clients.put( id, new SocketManager( socket, id ) );
   }
 
   /**
@@ -63,7 +67,7 @@ public class ServerManager
    * @param buf - The data to send
    * @param id - The id of the client to send the data to
    */
-  public void sendToClient( AIPacket packet, int id )
+  public void sendToClient( AIPacket packet, UUID id )
   {
     this.clients.get( id ).sendPacket( packet );
   }
@@ -72,9 +76,9 @@ public class ServerManager
   {
     this.isRunning = false;
     // Closes all of the client sockets
-    for ( SocketManager socketManager : clients )
+    for ( UUID key : clients.keySet() )
     {
-      socketManager.close();
+      clients.remove( key ).close();
     }
   }
 }

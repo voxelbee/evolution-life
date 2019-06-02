@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.UUID;
 
 import com.evolution.network.packet.AIPacket;
 import com.evolution.network.packet.EnumPacketTypes;
@@ -19,7 +20,7 @@ public class SocketManager
   private OutputStream out;
   private InputStream in;
 
-  private int id;
+  private UUID clientId;
 
   /**
    * Creates a new socket manager for this client and listens to data being sent
@@ -28,12 +29,12 @@ public class SocketManager
    * @param id - The index of this client in the client array
    * @throws IOException
    */
-  public SocketManager( Socket inSocket, int id ) throws IOException
+  public SocketManager( Socket inSocket, UUID id ) throws IOException
   {
     this.isListening = true;
     this.out = inSocket.getOutputStream();
     this.in = inSocket.getInputStream();
-    this.id = id;
+    this.clientId = id;
 
     ( new Thread( new Runnable()
     {
@@ -75,7 +76,7 @@ public class SocketManager
 
     AIPacket packet = EnumPacketTypes.PacketTypes.getPacketFromID( buf.readInt() );
     packet.readPacket( buf );
-    packet.handlePacket();
+    MainThreadPacketHandler.handlePacket( packet, this.clientId );
     buf.release();
   }
 

@@ -1,5 +1,7 @@
 package com.evolution.network.packet;
 
+import java.util.UUID;
+
 import com.evolution.EvolutionLife;
 
 import io.netty.buffer.ByteBuf;
@@ -7,7 +9,6 @@ import io.netty.buffer.ByteBuf;
 public class ClientCountPacket implements AIPacket
 {
   public int AICount;
-  public static final int ID = 0;
 
   public ClientCountPacket( int count )
   {
@@ -32,8 +33,8 @@ public class ClientCountPacket implements AIPacket
   }
 
   @Override
-  public void handlePacket()
+  public void handlePacket( UUID clientID )
   {
-    EvolutionLife.manager.spawnCount += AICount;
+    EvolutionLife.manager.handleNewConnection( this.AICount, clientID );
   }
 }

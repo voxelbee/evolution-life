@@ -3,6 +3,8 @@ package com.evolution;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.evolution.ai.EvolutionManager;
+
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -22,7 +24,10 @@ public class EvolutionLife
   public static final String MODNAME = "Evolution";
   public static final String MODVERSION = "0.0.1";
 
-  public static AIManager manager;
+  public static final String ADDRESS = "localhost";
+  public static final int PORT = 5000;
+
+  public static EvolutionManager manager;
 
   public EvolutionLife()
   {
