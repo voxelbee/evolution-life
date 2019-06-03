@@ -2,11 +2,12 @@ package com.evolution.network;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import com.evolution.EvolutionLife;
 import com.evolution.ai.EntityAI;
+import com.evolution.network.packet.AIPacket;
+import com.evolution.network.packet.PacketClientSettings;
 import com.mojang.authlib.GameProfile;
 
 import net.minecraft.network.EnumPacketDirection;
@@ -15,17 +16,30 @@ import net.minecraft.server.management.PlayerInteractionManager;
 import net.minecraft.world.GameType;
 import net.minecraft.world.dimension.DimensionType;
 
-public class Client
+public class ClientHandler
 {
   private Map< UUID, EntityAI > entities = new HashMap< UUID, EntityAI >();
-  private SocketManager socket;
 
-  private UUID id;
+  private AINetworkManager networkManager;
 
-  public Client( SocketManager inSocket, UUID thisID )
+  public ClientHandler( AINetworkManager inNetworkManager )
   {
-    this.socket = inSocket;
-    this.id = thisID;
+    this.networkManager = inNetworkManager;
+  }
+
+  /**
+   * Sends a packet to the client.
+   *
+   * @param packet
+   */
+  public void sendPacket( AIPacket packet )
+  {
+    this.networkManager.sendPacket( packet );
+  }
+
+  public boolean isConnected()
+  {
+    return this.networkManager.isConnected;
   }
 
   /**
@@ -55,8 +69,7 @@ public class Client
     EvolutionLife.mcServer.getPlayerList().initializeConnectionToPlayer( new NetworkManager( EnumPacketDirection.CLIENTBOUND ), entity );
     entity.stepHeight = 0.5f;
     entity.setGameType( GameType.SURVIVAL );
-    entity.onKillCommand(); // Set the player to be ready for spawning
-    entity.owner = id;
+    // entity.onKillCommand(); // Set the player to be ready for spawning
     entities.put( entity.getUniqueID(), entity );
     return entity.getUniqueID();
   }
@@ -71,18 +84,17 @@ public class Client
     EvolutionLife.mcServer.getPlayerList().playerLoggedOut( entities.get( id ) );
   }
 
-  public SocketManager getSocket()
-  {
-    return this.socket;
-  }
-
   /**
-   * Returns all of the UUIDs of the entities owned by this client
+   * Handles a settings packet from the client. This is usually the first
+   * packet to be received. It creates all the entities needed for this client
    *
-   * @return
+   * @param packet - The packet to handle
    */
-  public Set< UUID > getUUIDs()
+  public void handleClientSettings( PacketClientSettings packet )
   {
-    return this.entities.keySet();
+    for ( int i = 0; i < packet.entitySimulationCount; i++ )
+    {
+      this.createNewEntity( "Bob" );
+    }
   }
 }

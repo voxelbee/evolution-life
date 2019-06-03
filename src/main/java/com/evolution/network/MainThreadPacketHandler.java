@@ -11,9 +11,9 @@ public class MainThreadPacketHandler
   private static Queue< ClientPacketHolder > packetQueue = new PriorityQueue< ClientPacketHolder >();
   private static int maxPacketProcessing = 2000;
 
-  public static void handlePacket( AIPacket packet, UUID clientId )
+  public static void handlePacket( AIPacket packet, UUID clientID )
   {
-    packetQueue.add( new ClientPacketHolder( packet, clientId ) );
+    packetQueue.add( new ClientPacketHolder( packet, clientID ) );
   }
 
   public static void tick()

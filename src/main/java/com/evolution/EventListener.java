@@ -2,7 +2,6 @@ package com.evolution;
 
 import com.evolution.ai.EvolutionManager;
 import com.evolution.network.MainThreadPacketHandler;
-import com.evolution.network.ServerManager;
 
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
@@ -24,7 +23,7 @@ public class EventListener
     EvolutionLife.mcServer = event.getServer();
 
     // Creates the evolution manager
-    EvolutionLife.manager = new EvolutionManager( new ServerManager( EvolutionLife.ADDRESS, EvolutionLife.PORT ) );
+    EvolutionLife.manager = new EvolutionManager();
   }
 
   @SubscribeEvent

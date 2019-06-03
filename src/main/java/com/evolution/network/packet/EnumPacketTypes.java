@@ -7,8 +7,8 @@ import java.util.Map;
 
 public enum EnumPacketTypes
 {
-  CLIENTCOUNT( ClientCountPacket.class ),
-  DNA( DNAPacket.class );
+  SUCCESS( PacketConnectionSuccess.class ),
+  CLIENTSETTINGS( PacketClientSettings.class );
 
   private Class< ? > packetClass;
 
@@ -58,7 +58,7 @@ public enum EnumPacketTypes
      * @param packet - The packet to get id from
      * @return
      */
-    public static int getIdFromPacket( AIPacket packet )
+    public static Integer getIdFromPacket( AIPacket packet )
     {
       return PacketTypes.IDMAP.get( packet.getClass() );
     }

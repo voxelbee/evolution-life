@@ -1,18 +1,24 @@
 package com.evolution.ai;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
-import com.evolution.network.Client;
-import com.evolution.network.ServerManager;
+import com.evolution.EvolutionLife;
+import com.evolution.network.AINetworkManager;
+import com.evolution.network.ClientHandler;
+import com.evolution.network.packet.PacketConnectionSuccess;
+import com.evolution.network.packet.PacketSocketConnect;
 
 public class EvolutionManager
 {
-  public ServerManager dispatchServer;
   private DNAGenerator breeder;
 
-  public EvolutionManager( ServerManager server )
+  private Map< UUID, ClientHandler > clients = new HashMap< UUID, ClientHandler >();
+
+  public EvolutionManager()
   {
-    this.dispatchServer = server;
+    AINetworkManager.createServer( EvolutionLife.ADDRESS, EvolutionLife.PORT, UUID.randomUUID() );
 
     this.breeder = new DNAGenerator();
     Thread threadBreeder = new Thread( this.breeder );
@@ -22,7 +28,6 @@ public class EvolutionManager
 
   public void close()
   {
-    this.dispatchServer.close();
     this.breeder.stop();
   }
 
@@ -31,27 +36,29 @@ public class EvolutionManager
    */
   public void tick()
   {
-    this.dispatchServer.tickClients();
+    for ( UUID key : this.clients.keySet() )
+    {
+      this.clients.get( key ).tick();
+    }
   }
 
   /**
-   * Handles a new connection from a client. Creates the new entities that the client
-   * will control and then dispatches the generation of new DNA for these ai's.
+   * Handles the connection of a new client by creating the handler and adding it to the clients
+   * list.
    *
-   * @param aisToSim - The number of ai's that this client can run
-   * @param clientID - The id of the client that the packet is from
+   * @param packet - Packet to handle
    */
-  public void handleNewConnection( int aisToSim, UUID clientID )
+  public void handleSocketConnect( PacketSocketConnect packet )
   {
-    Client client = this.dispatchServer.getClient( clientID );
-    for ( int i = 0; i < aisToSim; i++ )
-    {
-      client.createNewEntity( "Bob" );
-    }
+    UUID id = UUID.randomUUID();
+    packet.netManager.setClientID( id );
+    clients.put( id, new ClientHandler( packet.netManager ) );
+    clients.get( id ).sendPacket( new PacketConnectionSuccess() );
+    System.out.println( "Client connected..." );
+  }
 
-    for ( UUID key : client.getUUIDs() )
-    {
-      this.breeder.addNewRandom( key );
-    }
+  public ClientHandler getClientHandler( UUID id )
+  {
+    return this.clients.get( id );
   }
 }

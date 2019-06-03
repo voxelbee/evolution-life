@@ -8,7 +8,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadLocalRandom;
 
 import com.evolution.EvolutionLife;
-import com.evolution.network.packet.DNAPacket;
 
 public class DNAGenerator implements Runnable
 {
@@ -37,7 +36,7 @@ public class DNAGenerator implements Runnable
       }
       catch ( InterruptedException e )
       {
-
+        return;
       }
     }
   }
@@ -48,7 +47,7 @@ public class DNAGenerator implements Runnable
   private void sendDNAPacket( UUID entityID, byte[] dna )
   {
     UUID clientID = ( (EntityAI) EvolutionLife.mcServer.getPlayerList().getPlayerByUUID( entityID ) ).owner;
-    EvolutionLife.manager.dispatchServer.sendToClient( new DNAPacket( dna, entityID ), clientID );
+    // EvolutionLife.manager.dispatchServer.sendToClient( new DNAPacket( dna, entityID ), clientID );
   }
 
   public byte[] generateNewRandom()

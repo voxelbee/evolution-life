@@ -3,38 +3,34 @@ package com.evolution.network.packet;
 import java.util.UUID;
 
 import com.evolution.EvolutionLife;
+import com.evolution.network.AINetworkManager;
 
 import io.netty.buffer.ByteBuf;
 
-public class ClientCountPacket implements AIPacket
+public class PacketSocketConnect implements AIPacket
 {
-  public int AICount;
+  public AINetworkManager netManager;
 
-  public ClientCountPacket( int count )
+  public PacketSocketConnect( AINetworkManager inNetManager )
   {
-    this.AICount = count;
-  }
-
-  public ClientCountPacket()
-  {
-
+    this.netManager = inNetManager;
   }
 
   @Override
   public void readPacket( ByteBuf buf )
   {
-    this.AICount = buf.readInt();
+
   }
 
   @Override
   public void writePacket( ByteBuf buf )
   {
-    buf.writeInt( this.AICount );
+
   }
 
   @Override
   public void handlePacket( UUID clientID )
   {
-    EvolutionLife.manager.handleNewConnection( this.AICount, clientID );
+    EvolutionLife.manager.handleSocketConnect( this );
   }
 }
