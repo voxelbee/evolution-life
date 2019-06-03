@@ -6,6 +6,10 @@ import io.netty.buffer.ByteBuf;
 
 public class PacketConnectionSuccess implements AIPacket
 {
+  public PacketConnectionSuccess()
+  {
+
+  }
 
   @Override
   public void readPacket( ByteBuf buf )

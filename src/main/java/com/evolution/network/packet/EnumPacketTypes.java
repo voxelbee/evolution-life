@@ -8,11 +8,12 @@ import java.util.Map;
 public enum EnumPacketTypes
 {
   SUCCESS( PacketConnectionSuccess.class ),
-  CLIENTSETTINGS( PacketClientSettings.class );
+  REQUESTENTITIES( PacketRequestEntities.class ),
+  DISPATCHENITITES( PacketDispatchEntities.class );
 
-  private Class< ? > packetClass;
+  private Class< ? extends AIPacket > packetClass;
 
-  EnumPacketTypes( Class< ? > intPacketClass )
+  EnumPacketTypes( Class< ? extends AIPacket > intPacketClass )
   {
     this.packetClass = intPacketClass;
   }
@@ -42,7 +43,7 @@ public enum EnumPacketTypes
     {
       try
       {
-        return (AIPacket) EnumPacketTypes.values()[ id ].packetClass.getConstructor().newInstance();
+        return EnumPacketTypes.values()[ id ].packetClass.getConstructor().newInstance();
       }
       catch ( InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
           | SecurityException e )

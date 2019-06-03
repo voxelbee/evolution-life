@@ -7,25 +7,25 @@ import com.evolution.network.BufferUtils;
 
 import io.netty.buffer.ByteBuf;
 
-public class PacketClientSettings implements AIPacket
+public class PacketRequestEntities implements AIPacket
 {
-  public int entitySimulationCount;
+  public int numberOfEntities;
 
   @Override
   public void readPacket( ByteBuf buf )
   {
-    this.entitySimulationCount = BufferUtils.readVarInt( buf );
+    this.numberOfEntities = BufferUtils.readVarInt( buf );
   }
 
   @Override
   public void writePacket( ByteBuf buf )
   {
-    BufferUtils.writeVarInt( buf, this.entitySimulationCount );
+    BufferUtils.writeVarInt( buf, this.numberOfEntities );
   }
 
   @Override
   public void handlePacket( UUID clientID )
   {
-    EvolutionLife.manager.getClientHandler( clientID ).handleClientSettings( this );
+    EvolutionLife.manager.handleClientEntityRequest( this, clientID );
   }
 }

@@ -43,7 +43,7 @@ public class AINetworkManager extends SimpleChannelInboundHandler< AIPacket >
 
   public boolean isConnected = false;
 
-  public static void createServer( String address, int port, UUID inClientID )
+  public static void createServer( String address, int port )
   {
     Class< ? extends ServerChannel > sClass;
     LazyLoadBase< ? extends EventLoopGroup > lazyloadbase;
@@ -94,11 +94,6 @@ public class AINetworkManager extends SimpleChannelInboundHandler< AIPacket >
     MainThreadPacketHandler.handlePacket( msg, clientID );
   }
 
-  /**
-   * Sends a packet to the server
-   *
-   * @param packetIn - The packet to send
-   */
   public void sendPacket( AIPacket packetIn )
   {
     if ( this.channel.eventLoop().inEventLoop() )
