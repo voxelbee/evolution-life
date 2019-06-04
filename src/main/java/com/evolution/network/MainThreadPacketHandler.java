@@ -1,19 +1,26 @@
 package com.evolution.network;
 
-import java.util.PriorityQueue;
-import java.util.Queue;
 import java.util.UUID;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import com.evolution.network.packet.AIPacket;
 
 public class MainThreadPacketHandler
 {
-  private static Queue< ClientPacketHolder > packetQueue = new PriorityQueue< ClientPacketHolder >();
+  private static BlockingQueue< ClientPacketHolder > packetQueue = new LinkedBlockingQueue< ClientPacketHolder >();
   private static int maxPacketProcessing = 2000;
 
   public static void handlePacket( AIPacket packet, UUID clientID )
   {
-    packetQueue.add( new ClientPacketHolder( packet, clientID ) );
+    try
+    {
+      packetQueue.put( new ClientPacketHolder( packet, clientID ) );
+    }
+    catch ( InterruptedException e )
+    {
+      e.printStackTrace();
+    }
   }
 
   public static void tick()

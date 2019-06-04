@@ -9,7 +9,8 @@ public enum EnumPacketTypes
 {
   SUCCESS( PacketConnectionSuccess.class ),
   REQUESTENTITIES( PacketRequestEntities.class ),
-  DISPATCHENITITES( PacketDispatchEntities.class );
+  DISPATCHENITITES( PacketDispatchEntity.class ),
+  REMOVEENTITY( PacketRemoveEntity.class );
 
   private Class< ? extends AIPacket > packetClass;
 

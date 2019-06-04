@@ -1,31 +1,28 @@
 package com.evolution.ai;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
 import java.util.UUID;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import com.evolution.EvolutionLife;
 import com.evolution.network.AINetworkManager;
 import com.evolution.network.ClientHandler;
 import com.evolution.network.packet.PacketConnectionSuccess;
-import com.evolution.network.packet.PacketDispatchEntities;
+import com.evolution.network.packet.PacketDispatchEntity;
 import com.evolution.network.packet.PacketRequestEntities;
 import com.evolution.network.packet.PacketSocketConnect;
-import com.mojang.authlib.GameProfile;
-
-import net.minecraft.server.management.PlayerInteractionManager;
-import net.minecraft.world.dimension.DimensionType;
 
 public class EvolutionManager
 {
   private DNAGenerator breeder;
 
   private Map< UUID, ClientHandler > clients = new HashMap< UUID, ClientHandler >();
-  private Queue< EntityAI > entitiesToSpawn = new PriorityQueue< EntityAI >();
+  private BlockingQueue< EntityAI > entitiesToSpawn = new LinkedBlockingQueue< EntityAI >();
+
+  public int counter = 0;
 
   public EvolutionManager()
   {
@@ -44,6 +41,7 @@ public class EvolutionManager
 
   public void tick()
   {
+    this.checkClientConnections();
     for ( UUID key : this.clients.keySet() )
     {
       this.clients.get( key ).tick();
@@ -61,43 +59,68 @@ public class EvolutionManager
 
   public void handleClientEntityRequest( PacketRequestEntities packet, UUID clientID )
   {
-    List< UUID > entityIds = new ArrayList< UUID >();
+    int countAdded = 0;
     for ( int i = 0; i < packet.numberOfEntities; i++ )
     {
       EntityAI entity = entitiesToSpawn.poll();
       if ( entity != null )
       {
+        entity.setOwner( clientID );
         this.getClientHandler( clientID ).addNewEntity( entity );
-        entityIds.add( entity.getUniqueID() );
+        this.getClientHandler( clientID ).sendPacket( new PacketDispatchEntity( clientID, entity.getDNA() ) );
+        System.out.println( "Spawned existing..." );
       }
       else
       {
+        countAdded = i;
         break;
       }
     }
 
-    int count = packet.numberOfEntities - entityIds.size();
+    int count = packet.numberOfEntities - countAdded;
     for ( int i = 0; i < count; i++ )
     {
-      EntityAI entity = this.createNewAI();
+      UUID newID = UUID.randomUUID();
+      EntityAI entity = new EntityAI( newID, newID.toString().substring( 0, 6 ), clientID );
       this.getClientHandler( clientID ).addNewEntity( entity );
-      entityIds.add( entity.getUniqueID() );
+      this.breeder.createNewStrand( entity.getUniqueID() );
     }
-
-    this.getClientHandler( clientID ).sendPacket( new PacketDispatchEntities( entityIds ) );
-  }
-
-  public EntityAI createNewAI()
-  {
-    EntityAI entity = new EntityAI( EvolutionLife.mcServer,
-        EvolutionLife.mcServer.getWorld( DimensionType.OVERWORLD ),
-        new GameProfile( UUID.randomUUID(), "Jim" ),
-        new PlayerInteractionManager( EvolutionLife.mcServer.getWorld( DimensionType.OVERWORLD ) ) );
-    return entity;
   }
 
   public ClientHandler getClientHandler( UUID id )
   {
     return this.clients.get( id );
+  }
+
+  private void checkClientConnections()
+  {
+    // this.clients.values().removeIf( entry -> !entry.isConnected() );
+    for ( Iterator< UUID > iterator = this.clients.keySet().iterator(); iterator.hasNext(); )
+    {
+      UUID key = iterator.next();
+      if ( !this.clients.get( key ).isConnected() )
+      {
+        ClientHandler handler = this.clients.get( key );
+        this.handleSocketDisconnect( handler );
+        handler.close();
+        iterator.remove();
+      }
+    }
+  }
+
+  public void handleSocketDisconnect( ClientHandler clientHandler )
+  {
+    for ( EntityAI entityAI : clientHandler.getAllEntites() )
+    {
+      try
+      {
+        this.entitiesToSpawn.put( entityAI );
+      }
+      catch ( InterruptedException e )
+      {
+        e.printStackTrace();
+      }
+    }
+    clientHandler.removeAllEntites();
   }
 }

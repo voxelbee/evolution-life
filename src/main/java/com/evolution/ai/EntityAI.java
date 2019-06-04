@@ -2,21 +2,27 @@ package com.evolution.ai;
 
 import java.util.UUID;
 
+import com.evolution.EvolutionLife;
 import com.mojang.authlib.GameProfile;
 
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerInteractionManager;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.dimension.DimensionType;
 
 public class EntityAI extends EntityPlayerMP
 {
-  public UUID owner;
+  private UUID owner;
+  private byte[] dna;
 
-  public EntityAI( MinecraftServer server, WorldServer worldIn, GameProfile profile, PlayerInteractionManager interactionManagerIn )
+  public EntityAI( UUID entityID, String name, UUID owner )
   {
-    super( server, worldIn, profile, interactionManagerIn );
+    super( EvolutionLife.mcServer,
+        EvolutionLife.mcServer.getWorld( DimensionType.OVERWORLD ),
+        new GameProfile( entityID, name ),
+        new PlayerInteractionManager( EvolutionLife.mcServer.getWorld( DimensionType.OVERWORLD ) ) );
+    this.stepHeight = 0.5f;
+    this.owner = owner;
   }
 
   public void setAiMovement( float forward, float strafe )
@@ -29,5 +35,25 @@ public class EntityAI extends EntityPlayerMP
   {
     this.rotationPitch = pitch % 360;
     this.rotationYaw = yaw % 360;
+  }
+
+  public byte[] getDNA()
+  {
+    return this.dna;
+  }
+
+  public void setDNA( byte[] inDna )
+  {
+    this.dna = inDna;
+  }
+
+  public UUID getOwner()
+  {
+    return this.owner;
+  }
+
+  public void setOwner( UUID id )
+  {
+    this.owner = id;
   }
 }

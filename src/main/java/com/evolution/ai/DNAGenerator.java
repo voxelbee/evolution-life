@@ -1,21 +1,20 @@
 package com.evolution.ai;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadLocalRandom;
 
 import com.evolution.EvolutionLife;
+import com.evolution.network.packet.PacketDispatchEntity;
 
 public class DNAGenerator implements Runnable
 {
+  // Length in bits
   private static final int DNA_LENGTH = 1024;
 
   private BlockingQueue< DNATasks > tasks = new LinkedBlockingQueue< DNATasks >();
 
-  private Map< UUID, byte[] > DNABank = new HashMap< UUID, byte[] >();
   private boolean run;
 
   @Override
@@ -30,7 +29,7 @@ public class DNAGenerator implements Runnable
         if ( task.taskType == com.evolution.ai.DNAGenerator.DNATasks.EnumTypes.NEW )
         {
           byte[] dna = this.generateNewRandom();
-          DNABank.put( task.entityID, dna );
+          ( (EntityAI) EvolutionLife.mcServer.getPlayerList().getPlayerByUUID( task.entityID ) ).setDNA( dna );
           this.sendDNAPacket( task.entityID, dna );
         }
       }
@@ -41,28 +40,20 @@ public class DNAGenerator implements Runnable
     }
   }
 
-  /**
-   * Sends the dna packet to the client that owns this entity
-   */
   private void sendDNAPacket( UUID entityID, byte[] dna )
   {
-    UUID clientID = ( (EntityAI) EvolutionLife.mcServer.getPlayerList().getPlayerByUUID( entityID ) ).owner;
-    // EvolutionLife.manager.dispatchServer.sendToClient( new DNAPacket( dna, entityID ), clientID );
+    UUID clientID = ( (EntityAI) EvolutionLife.mcServer.getPlayerList().getPlayerByUUID( entityID ) ).getOwner();
+    EvolutionLife.manager.getClientHandler( clientID ).sendPacket( new PacketDispatchEntity( entityID, dna ) );
   }
 
-  public byte[] generateNewRandom()
+  private byte[] generateNewRandom()
   {
     byte[] dna = new byte[ DNA_LENGTH / 4 ];
     ThreadLocalRandom.current().nextBytes( dna );
     return dna;
   }
 
-  /**
-   * Creates new random DNA and then sends it to the client controller
-   *
-   * @param entityId
-   */
-  public void addNewRandom( UUID entityId )
+  public void createNewStrand( UUID entityId )
   {
     tasks.add( new DNATasks( com.evolution.ai.DNAGenerator.DNATasks.EnumTypes.NEW, entityId ) );
   }

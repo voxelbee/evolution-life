@@ -41,8 +41,6 @@ public class AINetworkManager extends SimpleChannelInboundHandler< AIPacket >
 
   private Channel channel;
 
-  public boolean isConnected = false;
-
   public static void createServer( String address, int port )
   {
     Class< ? extends ServerChannel > sClass;
@@ -117,7 +115,26 @@ public class AINetworkManager extends SimpleChannelInboundHandler< AIPacket >
   {
     super.channelActive( p_channelActive_1_ );
     this.channel = p_channelActive_1_.channel();
-    this.isConnected = true;
     MainThreadPacketHandler.handlePacket( new PacketSocketConnect( this ), clientID );
+  }
+
+  public boolean isConnected()
+  {
+    return this.channel != null ? this.channel.isActive() : false;
+  }
+
+  public void close()
+  {
+    if ( this.channel.isOpen() )
+    {
+      try
+      {
+        this.channel.close().sync();
+      }
+      catch ( InterruptedException e )
+      {
+        e.printStackTrace();
+      }
+    }
   }
 }
