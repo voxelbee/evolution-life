@@ -3,7 +3,10 @@ package com.evolution;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.evolution.ai.EvolutionManager;
+import com.evolution.client.ClientHandler;
+import com.evolution.network.EvolutionLifePacketHandler;
+import com.evolution.network.OrganismCountPacket;
+import com.evolution.server.ServerHandler;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.MinecraftForge;
@@ -25,10 +28,9 @@ public class EvolutionLife
   public static final String MODNAME = "Evolution";
   public static final String MODVERSION = "0.0.1";
 
-  public static final String ADDRESS = "localhost";
-  public static final int PORT = 5000;
+  public static ServerHandler serverHandler;
+  public static ClientHandler clientHandler;
 
-  public static EvolutionManager manager;
   public static MinecraftServer mcServer;
 
   public EvolutionLife()
@@ -44,6 +46,13 @@ public class EvolutionLife
 
     // Register ourselves for server and other game events we are interested in
     MinecraftForge.EVENT_BUS.register( this );
+
+    int id = 0;
+    EvolutionLifePacketHandler.INSTANCE.registerMessage( id++ ,
+        OrganismCountPacket.class,
+        OrganismCountPacket.ENCODER,
+        OrganismCountPacket.DECODER,
+        EvolutionLifePacketHandler::handleCountPacket );
   }
 
   private void setup( final FMLCommonSetupEvent event )

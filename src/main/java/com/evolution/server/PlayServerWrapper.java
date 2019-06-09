@@ -1,11 +1,9 @@
-package com.evolution.network;
+package com.evolution.server;
 
 import java.util.Collections;
 import java.util.Set;
 
 import javax.annotation.Nullable;
-
-import com.evolution.ai.EntityAI;
 
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
@@ -51,6 +49,7 @@ import net.minecraft.network.play.client.CPacketUpdateSign;
 import net.minecraft.network.play.client.CPacketUpdateStructureBlock;
 import net.minecraft.network.play.client.CPacketUseEntity;
 import net.minecraft.network.play.client.CPacketVehicleMove;
+import net.minecraft.network.play.server.SPacketChunkData;
 import net.minecraft.network.play.server.SPacketPlayerPosLook;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.ITextComponent;
@@ -58,9 +57,9 @@ import net.minecraft.util.text.ITextComponent;
 public class PlayServerWrapper extends NetHandlerPlayServer
 {
   private final MinecraftServer server;
-  public EntityAI player;
+  public EntityOrganism player;
 
-  public PlayServerWrapper( MinecraftServer server, EntityAI playerIn )
+  public PlayServerWrapper( MinecraftServer server, EntityOrganism playerIn )
   {
     super( server, new DummyNetworkManager(), playerIn );
     this.server = server;
@@ -71,7 +70,7 @@ public class PlayServerWrapper extends NetHandlerPlayServer
   @Override
   public void tick()
   {
-    this.player.playerTick();
+
   }
 
   @Override
@@ -277,7 +276,12 @@ public class PlayServerWrapper extends NetHandlerPlayServer
   @Override
   public void sendPacket( Packet< ? > packetIn, @Nullable GenericFutureListener< ? extends Future< ? super Void > > futureListeners )
   {
-    System.out.println( "Sending packet: " + packetIn.getClass().getSimpleName() );
+    if ( packetIn instanceof SPacketChunkData )
+    {
+      SPacketChunkData data = (SPacketChunkData) packetIn;
+      data.getChunkX();
+    }
+    // System.out.println( "Sending packet: " + packetIn.getClass().getSimpleName() );
   }
 
   /**

@@ -1,35 +1,66 @@
 package com.evolution;
 
-import com.evolution.ai.EvolutionManager;
-import com.evolution.network.MainThreadPacketHandler;
+import java.io.IOException;
 
+import com.evolution.client.ClientHandler;
+import com.evolution.server.ServerHandler;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 
 public class EventListener
 {
+  private boolean first = true;
+
   @SubscribeEvent
   public void onServerTick( ServerTickEvent event )
   {
-    MainThreadPacketHandler.tick();
-    EvolutionLife.manager.tick();
+    EvolutionLife.serverHandler.tick();
   }
 
   @SubscribeEvent
-  public void onServerStarting( FMLServerStartingEvent event ) throws Exception
+  public void onClientTick( ClientTickEvent e ) throws IOException
+  {
+    if ( Minecraft.getInstance().world != null )
+    {
+      if ( first )
+      {
+        EvolutionLife.clientHandler = new ClientHandler();
+        EvolutionLife.clientHandler.sendOrganismRequest();
+        this.first = false;
+      }
+    }
+  }
+
+  @SubscribeEvent
+  public void onServerStarting( FMLServerStartingEvent event )
   {
     EvolutionLife.mcServer = event.getServer();
-
-    // Creates the evolution manager
-    EvolutionLife.manager = new EvolutionManager();
+    EvolutionLife.serverHandler = new ServerHandler();
   }
 
   @SubscribeEvent
-  public void onServerStopping( FMLServerStoppingEvent event ) throws Exception
+  public void onServerStopping( FMLServerStoppingEvent event )
   {
-    // Creates the evolution manager
-    EvolutionLife.manager.close();
+    EvolutionLife.serverHandler.close();
+  }
+
+  @SubscribeEvent
+  public void onClientJoin( PlayerLoggedInEvent event )
+  {
+    EvolutionLife.serverHandler.addClient( (EntityPlayerMP) event.getPlayer() );
+  }
+
+  @SubscribeEvent
+  public void onClientLeave( PlayerLoggedOutEvent event )
+  {
+    EvolutionLife.serverHandler.removeClient( (EntityPlayerMP) event.getPlayer() );
   }
 }
