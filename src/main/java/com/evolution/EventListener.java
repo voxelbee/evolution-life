@@ -3,6 +3,8 @@ package com.evolution;
 import java.io.IOException;
 
 import com.evolution.client.ClientHandler;
+import com.evolution.commands.StartCommand;
+import com.evolution.commands.StopCommand;
 import com.evolution.server.EntityOrganism;
 import com.evolution.server.ServerHandler;
 

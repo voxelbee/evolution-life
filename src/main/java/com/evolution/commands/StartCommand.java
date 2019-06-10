@@ -1,7 +1,8 @@
-package com.evolution;
+package com.evolution.commands;
 
 import java.util.Collection;
 
+import com.evolution.EvolutionLife;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;

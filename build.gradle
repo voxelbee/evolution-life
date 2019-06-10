@@ -80,6 +80,14 @@ dependencies {
     // Real examples
     // compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
     // compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
+    
+    // https://mvnrepository.com/artifact/org.tensorflow/libtensorflow_jni
+	compile group: 'org.tensorflow', name: 'libtensorflow_jni_gpu', version: '1.13.1'
+    // https://mvnrepository.com/artifact/org.tensorflow/libtensorflow
+	compile group: 'org.tensorflow', name: 'libtensorflow', version: '1.13.1'
+    // https://mvnrepository.com/artifact/org.tensorflow/tensorflow
+	//compile group: 'org.tensorflow', name: 'tensorflow', version: '1.13.1'
+    
 
     // The 'provided' configuration is for optional dependencies that exist at compile-time but might not at runtime.
     // provided 'com.mod-buildcraft:buildcraft:6.0.8:dev'
