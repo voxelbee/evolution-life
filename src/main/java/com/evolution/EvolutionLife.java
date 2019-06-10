@@ -5,7 +5,9 @@ import org.apache.logging.log4j.Logger;
 
 import com.evolution.client.ClientHandler;
 import com.evolution.network.EvolutionLifePacketHandler;
-import com.evolution.network.OrganismCountPacket;
+import com.evolution.network.FinishedProcessPacket;
+import com.evolution.network.RequestProcessPacket;
+import com.evolution.network.StopProcessPacket;
 import com.evolution.server.ServerHandler;
 
 import net.minecraft.server.MinecraftServer;
@@ -49,10 +51,22 @@ public class EvolutionLife
 
     int id = 0;
     EvolutionLifePacketHandler.INSTANCE.registerMessage( id++ ,
-        OrganismCountPacket.class,
-        OrganismCountPacket.ENCODER,
-        OrganismCountPacket.DECODER,
-        EvolutionLifePacketHandler::handleCountPacket );
+        RequestProcessPacket.class,
+        RequestProcessPacket.ENCODER,
+        RequestProcessPacket.DECODER,
+        EvolutionLifePacketHandler::handleRequestProcess );
+
+    EvolutionLifePacketHandler.INSTANCE.registerMessage( id++ ,
+        FinishedProcessPacket.class,
+        FinishedProcessPacket.ENCODER,
+        FinishedProcessPacket.DECODER,
+        EvolutionLifePacketHandler::handleFinishedProcess );
+
+    EvolutionLifePacketHandler.INSTANCE.registerMessage( id++ ,
+        StopProcessPacket.class,
+        StopProcessPacket.ENCODER,
+        StopProcessPacket.DECODER,
+        EvolutionLifePacketHandler::handleStopProccess );
   }
 
   private void setup( final FMLCommonSetupEvent event )

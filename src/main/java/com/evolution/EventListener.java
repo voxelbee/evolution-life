@@ -3,6 +3,7 @@ package com.evolution;
 import java.io.IOException;
 
 import com.evolution.client.ClientHandler;
+import com.evolution.server.EntityOrganism;
 import com.evolution.server.ServerHandler;
 
 import net.minecraft.client.Minecraft;
@@ -33,8 +34,11 @@ public class EventListener
       if ( first )
       {
         EvolutionLife.clientHandler = new ClientHandler();
-        EvolutionLife.clientHandler.sendOrganismRequest();
         this.first = false;
+      }
+      if ( !Minecraft.getInstance().isGamePaused() )
+      {
+        EvolutionLife.clientHandler.tick();
       }
     }
   }
@@ -42,6 +46,9 @@ public class EventListener
   @SubscribeEvent
   public void onServerStarting( FMLServerStartingEvent event )
   {
+    StartCommand.register( event.getCommandDispatcher() );
+    StopCommand.register( event.getCommandDispatcher() );
+
     EvolutionLife.mcServer = event.getServer();
     EvolutionLife.serverHandler = new ServerHandler();
   }
@@ -61,6 +68,9 @@ public class EventListener
   @SubscribeEvent
   public void onClientLeave( PlayerLoggedOutEvent event )
   {
-    EvolutionLife.serverHandler.removeClient( (EntityPlayerMP) event.getPlayer() );
+    if ( !( event.getPlayer() instanceof EntityOrganism ) )
+    {
+      EvolutionLife.serverHandler.removeClient( (EntityPlayerMP) event.getPlayer(), false );
+    }
   }
 }

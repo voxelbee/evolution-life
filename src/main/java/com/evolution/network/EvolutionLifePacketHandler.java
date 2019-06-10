@@ -19,13 +19,37 @@ public class EvolutionLifePacketHandler
       PROTOCOL_VERSION::equals,
       PROTOCOL_VERSION::equals );
 
-  public static void handleCountPacket( OrganismCountPacket msg, Supplier< NetworkEvent.Context > ctx )
+  public static void handleRequestProcess( RequestProcessPacket msg, Supplier< NetworkEvent.Context > ctx )
+  {
+    ctx.get().enqueueWork( () ->
+    {
+      if ( !isServer( ctx.get() ) )
+      {
+        EvolutionLife.clientHandler.requestProcess( msg.organisms );
+      }
+    } );
+    ctx.get().setPacketHandled( true );
+  }
+
+  public static void handleFinishedProcess( FinishedProcessPacket msg, Supplier< NetworkEvent.Context > ctx )
   {
     ctx.get().enqueueWork( () ->
     {
       if ( isServer( ctx.get() ) )
       {
-        EvolutionLife.serverHandler.addOrgansimsToClient( ctx.get().getSender(), msg.numberOfOrganisms );
+        EvolutionLife.serverHandler.clientProcessResponse( msg, ctx.get().getSender() );
+      }
+    } );
+    ctx.get().setPacketHandled( true );
+  }
+
+  public static void handleStopProccess( StopProcessPacket msg, Supplier< NetworkEvent.Context > ctx )
+  {
+    ctx.get().enqueueWork( () ->
+    {
+      if ( !isServer( ctx.get() ) )
+      {
+        EvolutionLife.clientHandler.stopProccessing( msg.organisms );
       }
     } );
     ctx.get().setPacketHandled( true );

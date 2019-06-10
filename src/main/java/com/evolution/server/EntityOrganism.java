@@ -21,6 +21,9 @@ import net.minecraft.world.dimension.DimensionType;
 
 public class EntityOrganism extends EntityPlayerMP
 {
+  public boolean processed;
+  public int skippedTicks = 0;
+
   public EntityOrganism( UUID entityID, String name )
   {
     super( EvolutionLife.mcServer,
