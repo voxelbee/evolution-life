@@ -1,14 +1,16 @@
 package com.evolution.client;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
-import com.evolution.network.EvolutionLifePacketHandler;
-import com.evolution.network.FinishedProcessPacket;
+import com.evolution.tensorflow.Network;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
+import net.minecraft.client.renderer.texture.NativeImage;
+import net.minecraft.util.ScreenShotHelper;
 
 public class ClientHandler
 {
@@ -18,55 +20,38 @@ public class ClientHandler
 
   private int tickId;
 
-  private List< EntityOtherPlayerMP > organisms = new ArrayList< EntityOtherPlayerMP >();
-
-  private List< Float > forwards = new ArrayList< Float >();
-  private List< Float > strafe = new ArrayList< Float >();
-  private List< Boolean > jump = new ArrayList< Boolean >();
+  private Map< UUID, Network > networks = new HashMap< UUID, Network >();
 
   public ClientHandler()
   {
     this.render = new ViewRender( renderSize, renderSize );
   }
 
-  public void requestProcess( List< UUID > inOrganisms )
+  public void requestProcess( UUID inOrganism, byte[] inDna )
   {
-    this.organisms.clear();
-    for ( UUID id : inOrganisms )
-    {
-      this.organisms.add( (EntityOtherPlayerMP) Minecraft.getInstance().world.getPlayerEntityByUUID( id ) );
-      this.forwards.add( 0.0f );
-      this.strafe.add( 0.0f );
-      this.jump.add( false );
-    }
+    this.networks.put( inOrganism, new Network( inOrganism, renderSize, 5, inDna ) );
   }
 
-  public void stopProccessing( List< UUID > inOrganisms )
+  public void stopProccessing( Set< UUID > inOrganisms )
   {
     for ( UUID id : inOrganisms )
     {
-      int i = this.organisms.indexOf( Minecraft.getInstance().world.getPlayerEntityByUUID( id ) );
-      this.organisms.remove( i );
-      this.forwards.remove( i );
-      this.strafe.remove( i );
-      this.jump.remove( i );
+      Network net = this.networks.remove( id );
+      net.stop();
     }
   }
 
   public void tick()
   {
-    if ( !this.organisms.isEmpty() && tickId % 2 == 0 )
+    if ( !this.networks.isEmpty() && tickId % 2 == 0 )
     {
-      int i = 0;
-      for ( EntityOtherPlayerMP organism : organisms )
+      for ( UUID id : this.networks.keySet() )
       {
+        EntityOtherPlayerMP organism = (EntityOtherPlayerMP) Minecraft.getInstance().world.getPlayerEntityByUUID( id );
         this.render.renderView( organism );
-        this.forwards.set( i, 0.1f );
-        this.strafe.set( i, 0.0f );
-        this.jump.set( i, false );
-        i++ ;
+        NativeImage image = ScreenShotHelper.createScreenshot( renderSize, renderSize, this.render.getFrameBuffer() );
+        this.networks.get( id ).addTask( image );
       }
-      EvolutionLifePacketHandler.INSTANCE.sendToServer( new FinishedProcessPacket( forwards, strafe, jump ) );
     }
     tickId++ ;
   }

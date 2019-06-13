@@ -1,7 +1,6 @@
 package com.evolution.network;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -9,47 +8,48 @@ import net.minecraft.network.PacketBuffer;
 
 public class FinishedProcessPacket
 {
-  public List< Float > forwards;
-  public List< Float > strafe;
+  public UUID organism;
 
-  public List< Boolean > jump;
+  public float forwards;
+  public float strafe;
+  public float yaw;
+  public float pitch;
+
+  public boolean jump;
 
   public FinishedProcessPacket()
   {
 
   }
 
-  public FinishedProcessPacket( List< Float > inForwards, List< Float > inStrafe, List< Boolean > inJump )
+  public FinishedProcessPacket( UUID inOrganism, float inForwards, float inStrafe, float inYaw, float inPitch, boolean inJump )
   {
+    this.organism = inOrganism;
     this.forwards = inForwards;
     this.strafe = inStrafe;
+    this.yaw = inYaw;
+    this.pitch = inPitch;
     this.jump = inJump;
   }
 
   static public final BiConsumer< FinishedProcessPacket, PacketBuffer > ENCODER = ( msg, buffer ) ->
   {
-    buffer.writeVarInt( msg.forwards.size() );
-    for ( int i = 0; i < msg.forwards.size(); i++ )
-    {
-      buffer.writeFloat( msg.forwards.get( i ) );
-      buffer.writeFloat( msg.strafe.get( i ) );
-      buffer.writeBoolean( msg.jump.get( i ) );
-    }
+    buffer.writeUniqueId( msg.organism );
+    buffer.writeFloat( msg.forwards );
+    buffer.writeFloat( msg.strafe );
+    buffer.writeShort( (short) ( msg.yaw * 90 ) );
+    buffer.writeShort( (short) ( msg.pitch * 90 ) );
+    buffer.writeBoolean( msg.jump );
   };
 
   static public final Function< PacketBuffer, FinishedProcessPacket > DECODER = ( buffer ) ->
   {
-    List< Float > forwards = new ArrayList< Float >();
-    List< Float > strafe = new ArrayList< Float >();
-    List< Boolean > jump = new ArrayList< Boolean >();
-
-    int count = buffer.readVarInt();
-    for ( int i = 0; i < count; i++ )
-    {
-      forwards.add( buffer.readFloat() );
-      strafe.add( buffer.readFloat() );
-      jump.add( buffer.readBoolean() );
-    }
-    return new FinishedProcessPacket( forwards, strafe, jump );
+    UUID id = buffer.readUniqueId();
+    float forwards = buffer.readFloat();
+    float strafe = buffer.readFloat();
+    float yaw = buffer.readShort() / 90.0f;
+    float pitch = buffer.readShort() / 90.0f;
+    boolean jump = buffer.readBoolean();
+    return new FinishedProcessPacket( id, forwards, strafe, yaw, pitch, jump );
   };
 }

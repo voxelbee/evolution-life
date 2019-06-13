@@ -3,6 +3,7 @@ package com.evolution.commands;
 import java.util.Collection;
 
 import com.evolution.EvolutionLife;
+import com.evolution.server.EntityOrganism;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
@@ -15,7 +16,7 @@ public class StopCommand
 {
   public static void register( CommandDispatcher< CommandSource > dispatcher )
   {
-    // User types "/start"
+    // User types "/stop"
     dispatcher.register( Commands.literal( "stop" )
         // Needs permission level 2
         .requires( source -> source.hasPermissionLevel( 2 ) )
@@ -29,10 +30,19 @@ public class StopCommand
   private static int runStop( CommandSource source, Collection< EntityPlayerMP > targets )
       throws CommandSyntaxException
   {
-    for ( EntityPlayerMP target : targets )
+    try
     {
-      EvolutionLife.serverHandler.sendRemoveClients( target );
-      EvolutionLife.serverHandler.removeClient( target, true );
+      for ( EntityPlayerMP target : targets )
+      {
+        if ( !( target instanceof EntityOrganism ) )
+        {
+          EvolutionLife.serverHandler.removeClient( target );
+        }
+      }
+    }
+    catch ( Exception e )
+    {
+      e.printStackTrace();
     }
     return 1;
   }

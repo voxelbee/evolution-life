@@ -25,7 +25,7 @@ public class EvolutionLifePacketHandler
     {
       if ( !isServer( ctx.get() ) )
       {
-        EvolutionLife.clientHandler.requestProcess( msg.organisms );
+        EvolutionLife.clientHandler.requestProcess( msg.organism, msg.dna );
       }
     } );
     ctx.get().setPacketHandled( true );

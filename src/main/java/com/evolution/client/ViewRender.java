@@ -131,7 +131,6 @@ public class ViewRender
     Minecraft.getInstance().getTextureManager().bindTexture( TextureMap.LOCATION_BLOCKS_TEXTURE );
     RenderHelper.disableStandardItemLighting();
     worldrenderer.setupTerrain( entity, partialTicks, icamera, this.frameCount++ , false );
-    Minecraft.getInstance().renderGlobal.updateChunks( finishTimeNano );
     GlStateManager.matrixMode( 5888 );
     GlStateManager.pushMatrix();
     GlStateManager.disableAlphaTest();

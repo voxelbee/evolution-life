@@ -3,6 +3,7 @@ package com.evolution.commands;
 import java.util.Collection;
 
 import com.evolution.EvolutionLife;
+import com.evolution.server.EntityOrganism;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -34,9 +35,19 @@ public class StartCommand
   private static int runStart( CommandSource source, int count, Collection< EntityPlayerMP > targets )
       throws CommandSyntaxException
   {
-    for ( EntityPlayerMP target : targets )
+    try
     {
-      EvolutionLife.serverHandler.addOrgansimsToClient( target, count );
+      for ( EntityPlayerMP target : targets )
+      {
+        if ( !( target instanceof EntityOrganism ) )
+        {
+          EvolutionLife.serverHandler.addOrganismsToClient( target, count );
+        }
+      }
+    }
+    catch ( Exception e )
+    {
+      e.printStackTrace();
     }
     return 1;
   }

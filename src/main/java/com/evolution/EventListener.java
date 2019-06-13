@@ -72,7 +72,7 @@ public class EventListener
   {
     if ( !( event.getPlayer() instanceof EntityOrganism ) )
     {
-      EvolutionLife.serverHandler.removeClient( (EntityPlayerMP) event.getPlayer(), false );
+      // EvolutionLife.serverHandler.removeClient( (EntityPlayerMP) event.getPlayer(), false );
     }
   }
 }

@@ -1,7 +1,7 @@
 package com.evolution.network;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -10,14 +10,14 @@ import net.minecraft.network.PacketBuffer;
 
 public class StopProcessPacket
 {
-  public List< UUID > organisms;
+  public Set< UUID > organisms;
 
   public StopProcessPacket()
   {
 
   }
 
-  public StopProcessPacket( List< UUID > inOrganisms )
+  public StopProcessPacket( Set< UUID > inOrganisms )
   {
     this.organisms = inOrganisms;
   }
@@ -33,7 +33,7 @@ public class StopProcessPacket
 
   static public final Function< PacketBuffer, StopProcessPacket > DECODER = ( buffer ) ->
   {
-    List< UUID > organisms = new ArrayList< UUID >();
+    Set< UUID > organisms = new HashSet< UUID >();
     int count = buffer.readVarInt();
     for ( int i = 0; i < count; i++ )
     {
