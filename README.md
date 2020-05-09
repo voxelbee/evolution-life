@@ -1,5 +1,7 @@
 # evolution-life
 
+https://github.com/voxelbee/evolution-life-client
+
 Standalone installation
 ==============================
 
