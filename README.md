@@ -1,5 +1,10 @@
 # evolution-life
 
+Contains the server side code to run a modified minecraft server that can create neural network based AIs
+and train them using eveolution based ideas. They see the view through there own camera onto the world based on where
+they look.
+
+Link to the client version:
 https://github.com/voxelbee/evolution-life-client
 
 Standalone installation
